@@ -4,10 +4,12 @@ package com.example.corteosfios;
 import java.util.Random;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.net.Uri;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -81,10 +83,10 @@ public class ViewJogo extends View implements Runnable
 		bomba = new Fios(context, "Bomba",0,95);
 		
 		menu = new Fios(context,"Menu",0,0);
-		botaoJogar = new Fios(context,"botaoJogar",0,0);
-		botaoHonraEpoder = new Fios(context,"HonraEpoder",0,0);
+		botaoJogar = new Fios(context,"botaoJogar",170,300);
+		botaoHonraEpoder = new Fios(context,"botaoHonraEpoder",0,550);
 		
-		//fios[5] = new Fios(context, "Bomba", 50,0);
+	
 		
 		telas[0] = new Fios(context, "Explodiu", 0,0);
 		telas[1] = new Fios(context, "Venceu", 0, 0);
@@ -146,6 +148,38 @@ public class ViewJogo extends View implements Runnable
 		
 		for(int i = 0; i<fios.length; i++)
 		{
+			if(maquinaDeEstado ==2)
+			{
+				maisFios=0;
+				maquinaDeEstado = 3;
+				for(int j = 0; j < fios.length; j++)
+				{
+					fios[j].setImage(super.getContext(), reDraw[j]);
+					
+				}
+			}
+			
+			if(maquinaDeEstado ==3) //menu
+			{
+			if(x >= botaoJogar.getPosition().x && x <(botaoJogar.getPosition().x + botaoJogar.getImage().getWidth()) 
+			&& y >= botaoJogar.getPosition().y && y <(botaoJogar.getPosition().y + botaoJogar.getImage().getHeight()))
+				{
+					maquinaDeEstado = 0;
+					time = 0;
+				}
+			if(x >= botaoHonraEpoder.getPosition().x && x <(botaoHonraEpoder.getPosition().x + botaoHonraEpoder.getImage().getWidth()) 
+					&& y >= botaoHonraEpoder.getPosition().y && y <(botaoHonraEpoder.getPosition().y + botaoHonraEpoder.getImage().getHeight()))
+						{
+				/*String url = "https://www.facebook.com/honraepoder";
+				Intent intent = new Intent(Intent.ACTION_VIEW);
+				intent.setData(Uri.parse(url));
+				startActivity(intent);*/
+							
+						}
+			
+			
+			}
+			
 			if(maquinaDeEstado ==0 && time>10)
 			{
 			if(x >= fios[i].getPosition().x && x <(fios[i].getPosition().x + fios[i].getImage().getWidth()) 
@@ -172,11 +206,16 @@ public class ViewJogo extends View implements Runnable
 				}
 				numeroDoClick ++;	
 				
-				if(numeroDoClick == (3+maisFios))
+				if(numeroDoClick ==12)
+				{
+					maquinaDeEstado = 2;
+					break;
+				}
+				
+				if(numeroDoClick == (3+maisFios)) 
 					{
 					//venceu
-					maquinaDeEstado = 2;
-					
+										
 					//restaurar as imagens
 					//aumentar maisFios
 					//zerar numeroDoClick
@@ -205,6 +244,9 @@ public class ViewJogo extends View implements Runnable
 		return super.onTouchEvent(event);
 	}
 	
+
+
+
 	@Override
 	public void run() {
 		while (true) {
