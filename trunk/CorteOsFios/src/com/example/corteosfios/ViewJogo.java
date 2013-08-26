@@ -20,42 +20,47 @@ public class ViewJogo extends View implements Runnable
 	Boolean teste = false;
 	private Fios[] fios = new Fios[12]; 
 	private Fios[] telas = new Fios[3];
-	private Fios bomba;
+	private Fios bomba, menu, botaoJogar, botaoHonraEpoder;
 	
 	String ultimoFio;
 	String[] ordem = new String[12];
 	String[] reDraw = new String[12];
+	
 	int numeroDoClick;
 	Paint paint = new Paint();
 	Paint paintCronometro = new Paint();
 	int time;
-	int maquinaDeEstado;
+	int maquinaDeEstado = 3;
 	int maisFios;
 	
+	MaquinaDeEstados maquinaEstado = MaquinaDeEstados.Jogo;
+	
 
 	
-	
-	public void embaralhar()
+	public void embaralhar(String[] arraysDeString)
 	{
 		int l = 0;
-        for (int i = ordem.length - 1; i >= 0; i--)
+        for (int i = arraysDeString.length - 1; i >= 0; i--)
         {            
-           int j = rand.nextInt(ordem.length - l);
+           int j = rand.nextInt(arraysDeString.length - l);
 
             
-            String temp = ordem[i];
-            ordem[i] = ordem[j];
-            ordem[j] = temp;
+            String temp = arraysDeString[i];
+            arraysDeString[i] = arraysDeString[j];
+            arraysDeString[j] = temp;
             l++;
         }
 	
 	}
-		
+	
+	
 	public ViewJogo(Context context)
-	{	
+	{
+		
+		
 		super(context);
 		paint.setTextSize(30);
-		paint.setColor(Color.GREEN);
+		//paint.setColor(Color.GREEN);
 		paintCronometro.setTextSize(20);
 		paintCronometro.setColor(Color.RED);
 			
@@ -75,6 +80,10 @@ public class ViewJogo extends View implements Runnable
 	
 		bomba = new Fios(context, "Bomba",0,95);
 		
+		menu = new Fios(context,"Menu",0,0);
+		botaoJogar = new Fios(context,"botaoJogar",0,0);
+		botaoHonraEpoder = new Fios(context,"HonraEpoder",0,0);
+		
 		//fios[5] = new Fios(context, "Bomba", 50,0);
 		
 		telas[0] = new Fios(context, "Explodiu", 0,0);
@@ -87,11 +96,12 @@ public class ViewJogo extends View implements Runnable
 			ordem[i] = fios[i].imageName();
 			reDraw[i] = fios[i].imageName();
 			
+			
 		}
 		
 		//embaralhando os fios
 		
-		embaralhar();
+		embaralhar(ordem);
 		
 		
 		//altura e largura ainda não definidos no construtor, encontrar uma maneira de utilizar getWidth e getHeight
@@ -117,10 +127,26 @@ public class ViewJogo extends View implements Runnable
 		int y = (int) event.getY();
 		Log.i("Fios", "x: "+x +"y: "+ y);
 		
+		if(maquinaDeEstado == 1)
+		{
+			for(int j = 0; j < fios.length; j++)
+			{
+				fios[j].setImage(super.getContext(), reDraw[j]);
+				
+			}
+			
+			numeroDoClick = 0;
+			//ultimoFio = null;
+			time = 0;
+			ultimoFio = ordem[0];
+			maquinaDeEstado = 0;					
+		}
+		
+		
 		
 		for(int i = 0; i<fios.length; i++)
 		{
-			if(maquinaDeEstado ==0)
+			if(maquinaDeEstado ==0 && time>10)
 			{
 			if(x >= fios[i].getPosition().x && x <(fios[i].getPosition().x + fios[i].getImage().getWidth()) 
 			&& y >= fios[i].getPosition().y && y <(fios[i].getPosition().y + fios[i].getImage().getHeight()))
@@ -134,18 +160,19 @@ public class ViewJogo extends View implements Runnable
 				
 				ultimoFio = fios[i].imageName();
 				
-				Log.i("Fios", ultimoFio + " --- "+ fios[i].imageName());
+				Log.i("Fios", ultimoFio + " --- "+ ordem[numeroDoClick]);
 				
 				if(ordem[numeroDoClick] != ultimoFio)
 				{
 					Log.i(MainActivity.TAG, "EXPLODIU!!!!");
 					//perdeu
 					maquinaDeEstado = 1;
+					break;
 									
 				}
 				numeroDoClick ++;	
 				
-				if(numeroDoClick == (5+maisFios))
+				if(numeroDoClick == (3+maisFios))
 					{
 					//venceu
 					maquinaDeEstado = 2;
@@ -194,8 +221,9 @@ public class ViewJogo extends View implements Runnable
 	}
 	
 	public void draw(Canvas canvas) {
-		super.draw(canvas);		
+		super.draw(canvas);
 		
+						
 		canvas.drawText("Tela: "+this.getWidth()+ "x"+this.getHeight()+ "  "+time, 20, 20, new Paint());
 	
 		
@@ -209,18 +237,24 @@ public class ViewJogo extends View implements Runnable
 		for(int i = 0; i< fios.length; i++)
 		{
 		if(fios[i]!= null)
-			
+		{
+	
 		canvas.drawBitmap(fios[i].getImage(), fios[i].getPosition().x, fios[i].getPosition().y, new Paint());
+
+		
+		}
 		
 		canvas.drawBitmap(bomba.getImage(), bomba.getPosition().x,bomba.getPosition().y, new Paint());
-
+		
+		canvas.drawText(""+time, 300, 175, paintCronometro);
+		
 		}
 		if(maquinaDeEstado == 1)
 		{
 			//perdeu
 			
 			canvas.drawBitmap(telas[0].getImage(), telas[0].getPosition().x, telas[0].getPosition().y, new Paint());
-			
+			canvas.drawText("TOQUE NA TELA PARA TENTAR DE NOVO" , 1, 600, paintCronometro);
 		}
 		
 		if(maquinaDeEstado == 2)
@@ -228,34 +262,38 @@ public class ViewJogo extends View implements Runnable
 			//venceu
 			
 			canvas.drawBitmap(telas[1].getImage(), telas[1].getPosition().x, telas[1].getPosition().y, new Paint());
-			
-			
-				
-			
+
 		}
-		canvas.drawText(""+time, 300, 175, paintCronometro);
 		
-		if(time < (80+maisFios*10))
+		
+		if(time < (80+maisFios*6))
 		{
 			
 			canvas.drawBitmap(telas[2].getImage(), telas[2].getPosition().x, telas[2].getPosition().y, new Paint());
 			
 			canvas.drawText("A SEQUENCIA DE FIOS A SER CORTADA É:" , 1, 400,paint);
-			for(int i = 0; i< ordem.length-7+maisFios; i++)
+			for(int i = 0; i< ordem.length-9+maisFios; i++)
 			{
+				
 				canvas.drawText(ordem[i], 1, 450+(i*20), paint);
 				
 			}
 		}
 		
-		canvas.drawText("GIRE O CELULAR PARA REINICIAR" , 1, 700,paint);
 		
+		canvas.drawText("NÃO GIRE A BOMBA" , 1, 700,paint);
+		
+		if(maquinaDeEstado == 3) //MenuDoJogo
+		{
+			canvas.drawBitmap(menu.getImage(),menu.getPosition().x,menu.getPosition().y, new Paint());
+			canvas.drawBitmap(botaoJogar.getImage(), botaoJogar.getPosition().x,botaoJogar.getPosition().y, new Paint());
+			canvas.drawBitmap(botaoHonraEpoder.getImage(), botaoHonraEpoder.getPosition().x,botaoHonraEpoder.getPosition().y, new Paint());
+
+			
+		}
 		
 		}
 	
-		
-
-
 	private void update()
 	{
 		// TODO Auto-generated method stub
