@@ -3,17 +3,20 @@ package com.example.corteosfios;
 
 import java.util.Random;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewParent;
 
 public class ViewJogo extends View implements Runnable
 {
@@ -34,6 +37,13 @@ public class ViewJogo extends View implements Runnable
 	int time;
 	int maquinaDeEstado = 3;
 	int maisFios;
+	
+	MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.sound_file_1);
+
+	
+	
+	Vibrator v = (Vibrator) super.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+
 	
 	MaquinaDeEstados maquinaEstado = MaquinaDeEstados.Jogo;
 	
@@ -131,6 +141,10 @@ public class ViewJogo extends View implements Runnable
 		
 		if(maquinaDeEstado == 1)
 		{
+			
+			//v.vibrate(300);
+			
+			
 			for(int j = 0; j < fios.length; j++)
 			{
 				fios[j].setImage(super.getContext(), reDraw[j]);
@@ -151,12 +165,20 @@ public class ViewJogo extends View implements Runnable
 			if(maquinaDeEstado ==2)
 			{
 				maisFios=0;
-				maquinaDeEstado = 3;
+				restartFirstActivity();
+				//maquinaDeEstado = 3;
+				
+				
+				
+				
+				
 				for(int j = 0; j < fios.length; j++)
 				{
 					fios[j].setImage(super.getContext(), reDraw[j]);
 					
 				}
+				
+			
 			}
 			
 			if(maquinaDeEstado ==3) //menu
@@ -166,21 +188,22 @@ public class ViewJogo extends View implements Runnable
 				{
 					maquinaDeEstado = 0;
 					time = 0;
+					
 				}
 			if(x >= botaoHonraEpoder.getPosition().x && x <(botaoHonraEpoder.getPosition().x + botaoHonraEpoder.getImage().getWidth()) 
 					&& y >= botaoHonraEpoder.getPosition().y && y <(botaoHonraEpoder.getPosition().y + botaoHonraEpoder.getImage().getHeight()))
 						{
-				/*String url = "https://www.facebook.com/honraepoder";
+				String url = "https://www.facebook.com/honraepoder";
 				Intent intent = new Intent(Intent.ACTION_VIEW);
 				intent.setData(Uri.parse(url));
-				startActivity(intent);*/
-							
+				super.getContext().startActivity(intent);
+					
 						}
 			
 			
 			}
 			
-			if(maquinaDeEstado ==0 && time>10)
+			if(maquinaDeEstado ==0 && time>80+maisFios*6)
 			{
 			if(x >= fios[i].getPosition().x && x <(fios[i].getPosition().x + fios[i].getImage().getWidth()) 
 			&& y >= fios[i].getPosition().y && y <(fios[i].getPosition().y + fios[i].getImage().getHeight()))
@@ -201,6 +224,8 @@ public class ViewJogo extends View implements Runnable
 					Log.i(MainActivity.TAG, "EXPLODIU!!!!");
 					//perdeu
 					maquinaDeEstado = 1;
+					mp.start();
+
 					break;
 									
 				}
@@ -220,6 +245,8 @@ public class ViewJogo extends View implements Runnable
 					//aumentar maisFios
 					//zerar numeroDoClick
 					
+					
+					
 					maisFios++;
 					
 					
@@ -234,6 +261,7 @@ public class ViewJogo extends View implements Runnable
 					time = 0;
 					maquinaDeEstado = 0;
 					
+					
 					}
 					
 				}
@@ -243,9 +271,6 @@ public class ViewJogo extends View implements Runnable
 		
 		return super.onTouchEvent(event);
 	}
-	
-
-
 
 	@Override
 	public void run() {
@@ -334,16 +359,26 @@ public class ViewJogo extends View implements Runnable
 			
 		}
 		
-		}
+	}
 	
 	private void update()
 	{
 		// TODO Auto-generated method stub
-		time ++;
+		
+		
+		time++;
+		
 		
 	}
 	
-	
+	private void restartFirstActivity()
+	 {
+	 Intent i = getContext().getPackageManager()
+	 .getLaunchIntentForPackage(getContext().getPackageName() );
+
+	 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK );
+	 super.getContext().startActivity(i);
+	 }
 	
 
 }
