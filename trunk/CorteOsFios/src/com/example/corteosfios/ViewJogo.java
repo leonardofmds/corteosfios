@@ -6,6 +6,7 @@ import java.util.Random;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -18,14 +19,22 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewParent;
 
+
+
+
 public class ViewJogo extends View implements Runnable
 {
+	
+	
 	
 	Random rand = new Random();
 	Boolean teste = false;
 	private Fios[] fios = new Fios[12]; 
 	private Fios[] telas = new Fios[3];
-	private Fios bomba, menu, botaoJogar, botaoHonraEpoder;
+	private Fios bomba, menu, botaoJogar, botaoHonraEpoder, botaoMenu;
+	boolean start = true;
+	
+	
 	
 	String ultimoFio;
 	String[] ordem = new String[12];
@@ -38,6 +47,8 @@ public class ViewJogo extends View implements Runnable
 	int maquinaDeEstado = 3;
 	int maisFios;
 	
+	int testando;
+	
 	MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.sound_file_1);
 
 	
@@ -47,7 +58,14 @@ public class ViewJogo extends View implements Runnable
 	
 	MaquinaDeEstados maquinaEstado = MaquinaDeEstados.Jogo;
 	
-
+private void Initialize()
+{
+	if(start == true)
+	{
+		
+		
+	}
+}
 	
 	public void embaralhar(String[] arraysDeString)
 	{
@@ -64,14 +82,21 @@ public class ViewJogo extends View implements Runnable
         }
 	
 	}
+	private void redesenhar()
+	{
+		for(int j = 0; j < fios.length; j++)
+		{
+			fios[j].setImage(super.getContext(), reDraw[j]);
+			
+		}
+	}
 	
 	
 	public ViewJogo(Context context)
 	{
 		
-		
 		super(context);
-		paint.setTextSize(30);
+		paint.setTextSize(25);
 		//paint.setColor(Color.GREEN);
 		paintCronometro.setTextSize(20);
 		paintCronometro.setColor(Color.RED);
@@ -95,6 +120,7 @@ public class ViewJogo extends View implements Runnable
 		menu = new Fios(context,"Menu",0,0);
 		botaoJogar = new Fios(context,"botaoJogar",170,300);
 		botaoHonraEpoder = new Fios(context,"botaoHonraEpoder",0,550);
+		botaoMenu = new Fios(context, "botaoMenu", 340, 0);
 		
 	
 		
@@ -137,6 +163,7 @@ public class ViewJogo extends View implements Runnable
 	{
 		int x = (int) event.getX();
 		int y = (int) event.getY();
+		
 		Log.i("Fios", "x: "+x +"y: "+ y);
 		
 		if(maquinaDeEstado == 1)
@@ -145,11 +172,7 @@ public class ViewJogo extends View implements Runnable
 			//v.vibrate(300);
 			
 			
-			for(int j = 0; j < fios.length; j++)
-			{
-				fios[j].setImage(super.getContext(), reDraw[j]);
-				
-			}
+			redesenhar();
 			
 			numeroDoClick = 0;
 			//ultimoFio = null;
@@ -167,18 +190,10 @@ public class ViewJogo extends View implements Runnable
 				maisFios=0;
 				restartFirstActivity();
 				//maquinaDeEstado = 3;
+	
 				
-				
-				
-				
-				
-				for(int j = 0; j < fios.length; j++)
-				{
-					fios[j].setImage(super.getContext(), reDraw[j]);
-					
-				}
-				
-			
+				redesenhar();
+
 			}
 			
 			if(maquinaDeEstado ==3) //menu
@@ -191,7 +206,7 @@ public class ViewJogo extends View implements Runnable
 					
 				}
 			if(x >= botaoHonraEpoder.getPosition().x && x <(botaoHonraEpoder.getPosition().x + botaoHonraEpoder.getImage().getWidth()) 
-					&& y >= botaoHonraEpoder.getPosition().y && y <(botaoHonraEpoder.getPosition().y + botaoHonraEpoder.getImage().getHeight()))
+			&& y >= botaoHonraEpoder.getPosition().y && y <(botaoHonraEpoder.getPosition().y + botaoHonraEpoder.getImage().getHeight()))
 						{
 				String url = "https://www.facebook.com/honraepoder";
 				Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -205,6 +220,16 @@ public class ViewJogo extends View implements Runnable
 			
 			if(maquinaDeEstado ==0 && time>80+maisFios*6)
 			{
+				if(x >= botaoMenu.getPosition().x && x <(botaoMenu.getPosition().x + botaoMenu.getImage().getWidth()) 
+				&& y >= botaoMenu.getPosition().y && y <(botaoMenu.getPosition().y + botaoMenu.getImage().getHeight()))
+					{
+						maquinaDeEstado=3;
+						numeroDoClick = 0;
+						
+						redesenhar();
+						
+					}
+				
 			if(x >= fios[i].getPosition().x && x <(fios[i].getPosition().x + fios[i].getImage().getWidth()) 
 			&& y >= fios[i].getPosition().y && y <(fios[i].getPosition().y + fios[i].getImage().getHeight()))
 				{
@@ -250,11 +275,7 @@ public class ViewJogo extends View implements Runnable
 					maisFios++;
 					
 					
-					for(int j = 0; j < fios.length; j++)
-					{
-						fios[j].setImage(super.getContext(), reDraw[j]);
-						
-					}
+					redesenhar();
 					
 					numeroDoClick = 0;
 					//ultimoFio = null;
@@ -359,13 +380,18 @@ public class ViewJogo extends View implements Runnable
 			
 		}
 		
+		if(maquinaDeEstado == 0)
+		{
+			canvas.drawBitmap(botaoMenu.getImage(),botaoMenu.getPosition().x,botaoMenu.getPosition().y, new Paint());
+		}
+		
 	}
 	
 	private void update()
 	{
 		// TODO Auto-generated method stub
 		
-		
+	
 		time++;
 		
 		
@@ -379,6 +405,8 @@ public class ViewJogo extends View implements Runnable
 	 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK );
 	 super.getContext().startActivity(i);
 	 }
+	
+	
 	
 
 }

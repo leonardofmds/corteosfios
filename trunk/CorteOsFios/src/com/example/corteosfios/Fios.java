@@ -13,7 +13,6 @@ public class Fios
 {
 	private PointF position;
 	private Bitmap imagem;
-	private Bitmap imageBroke;
 	private String nomeDaImagem;
 		
 	public Fios( Context context, String nomeDaImagem, float positionX, float positionY)

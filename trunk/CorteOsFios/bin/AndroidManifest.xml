@@ -18,6 +18,7 @@
             android:name="com.example.corteosfios.MainActivity"
             android:label="@string/app_name" 
             android:screenOrientation="portrait"
+            
             >
             
             <intent-filter>
