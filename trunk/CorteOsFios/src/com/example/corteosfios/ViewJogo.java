@@ -5,23 +5,18 @@ import java.util.Random;
 
 import com.example.corteosfios.R;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PointF;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewParent;
 
 public class ViewJogo extends View implements Runnable
 {
@@ -37,10 +32,7 @@ public class ViewJogo extends View implements Runnable
 	
 	private boolean resizeElements = true;
 	
-	int testeDeResizing = 0;
-	
-	
-	
+	float tempo = 20;
 	
 	String ultimoFio;
 	String[] ordem = new String[12];
@@ -274,6 +266,7 @@ public class ViewJogo extends View implements Runnable
 					
 					
 					
+					
 					maisFios++;
 					
 					
@@ -282,6 +275,7 @@ public class ViewJogo extends View implements Runnable
 					numeroDoClick = 0;
 					//ultimoFio = null;
 					time = 0;
+					tempo = 20+(maisFios*2);
 					maquinaDeEstado = 0;
 					
 					
@@ -345,8 +339,13 @@ public class ViewJogo extends View implements Runnable
 		}
 		
 		canvas.drawBitmap(bomba.getImage(), bomba.getPosition().x,bomba.getPosition().y, new Paint());
+		String temp = "00:";
+		if(tempo<10)
+		{
+			temp = "00:0";
+		}
 		
-		canvas.drawText(""+time, getWidth()/1.6f, getHeight()/4.25f, paintCronometro);
+		canvas.drawText(temp+(int)tempo, getWidth()/1.6f, getHeight()/4.25f, paintCronometro);
 		
 		}
 		if(maquinaDeEstado == 1)
@@ -406,7 +405,7 @@ public class ViewJogo extends View implements Runnable
 
 
 		time++;
-		
+		cronometro();
 		
 	}
 	
@@ -437,6 +436,26 @@ public class ViewJogo extends View implements Runnable
 		}
 		
 		
+		
+	}
+	
+	private void cronometro()
+	{
+		if(maquinaDeEstado == 0)
+		{
+			tempo-=0.045f;
+		
+			if(tempo <= 0)
+			{
+				maquinaDeEstado = 1;
+				mp.start();
+			
+			}
+		}
+		else
+		{
+			tempo = 20+maisFios;
+		}
 		
 	}
 	
