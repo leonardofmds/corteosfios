@@ -188,7 +188,7 @@ public class ViewJogo extends View implements Runnable
 				if(x >= botaoMenu.getPosition().x && x <(botaoMenu.getPosition().x + botaoMenu.getImage().getWidth()) 
 				&& y >= botaoMenu.getPosition().y && y <(botaoMenu.getPosition().y + botaoMenu.getImage().getHeight()))
 					{
-						maquinaDeEstado=2;
+						maquinaDeEstado=3;
 						numeroDoClick = 0;
 						//setBackgroundColor(Color.BLACK);
 						redesenhar();
